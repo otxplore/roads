@@ -1,0 +1,578 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#11120f">
+<meta name="description" content="OTXS Road Conditions & Alerts — record and review travel conditions, road closures, snowfall and route hazards.">
+<title>Road Conditions & Alerts | OTXS</title>
+<style>
+:root{--bg:#11120f;--panel:#1b1d18;--panel2:#24261f;--text:#f5f3eb;--muted:#a5a798;--orange:#ff9f32;--yellow:#ffd166;--border:#34362d;--red:#ff8178;--green:#a8d5a2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{position:sticky;top:0;z-index:5;background:#11120ff2;border-bottom:1px solid var(--border);backdrop-filter:blur(10px)}
+.nav{max-width:1150px;margin:auto;padding:13px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:900;font-size:1.4rem;letter-spacing:1px}.brand span{color:var(--orange)}
+.nav select{max-width:185px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:9px}
+.hero{padding:52px 20px 38px;background:radial-gradient(ellipse at 85% 5%,#ff9f3220,transparent 45%)}
+.wrap{max-width:1150px;margin:auto}
+.eyebrow{color:var(--yellow);font-size:.8rem;font-weight:800;letter-spacing:1px}
+h1{font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.1;letter-spacing:-1.5px;margin:12px 0}
+h1 span{color:var(--orange)}
+p{margin:8px 0;color:var(--muted)}
+.hero p{max-width:680px;font-size:1.05rem}
+main{max-width:1150px;margin:auto;padding:0 20px 45px}
+.btn{border:1px solid var(--orange);background:var(--orange);color:#211609;padding:10px 14px;border-radius:9px;font-weight:800;display:inline-flex;justify-content:center;align-items:center;gap:6px}
+.btn.secondary{background:var(--panel2);border-color:var(--border);color:var(--text)}
+.btn.ghost{background:transparent;border-color:var(--border);color:var(--muted)}
+.btn.danger{background:#351d1a;border-color:#6d322b;color:#ffb1a9}
+.btn.small{padding:6px 10px;font-size:.85rem}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 30px}
+.stat,.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px}
+.stat{padding:15px}.stat strong{display:block;font-size:1.6rem;color:var(--yellow)}.stat span{font-size:.82rem;color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.9fr);gap:18px;align-items:start}
+.panel{padding:20px;margin-bottom:18px}
+h2{margin:0;font-size:1.35rem}h3{margin:0;font-size:1.05rem}
+.heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+label{display:block;font-size:.85rem;color:#d2d2c7;margin:0 0 5px}
+input,select,textarea{width:100%;background:#13140f;color:var(--text);border:1px solid var(--border);border-radius:9px;padding:10px 11px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--orange)}
+textarea{resize:vertical;min-height:78px}
+.field{margin-bottom:13px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-actions{display:flex;gap:8px;flex-wrap:wrap}
+.notice{background:#272317;border:1px solid #594628;padding:12px;border-radius:10px;color:#e9d4a6;font-size:.85rem;margin-bottom:16px}
+.filters{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.alert-list{display:grid;gap:12px}
+.alert{border:1px solid var(--border);background:#171812;border-radius:12px;padding:15px}
+.alert-top{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.alert h3{margin:0 0 4px}
+.meta{font-size:.8rem;color:var(--muted);display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}
+.pill{display:inline-block;padding:3px 8px;border-radius:6px;font-size:.76rem;font-weight:800;background:#292b24;color:#d9d9cc}
+.pill.high{background:#431f1c;color:#ffb1a9}.pill.medium{background:#45351b;color:#ffd88c}.pill.low{background:#223322;color:#b9e5b2}
+.pill.status{background:#252b2c;color:#b5dbe5}
+.alert p{color:#d0d0c5;font-size:.92rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.alert-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.empty{border:1px dashed var(--border);padding:28px;text-align:center;border-radius:12px;color:var(--muted)}
+.tip{padding:12px;border-left:3px solid var(--orange);background:#22221b;border-radius:0 9px 9px 0;margin:12px 0}
+.tip strong{display:block;font-size:.92rem}.tip span{font-size:.84rem;color:var(--muted)}
+footer{max-width:1150px;margin:auto;border-top:1px solid var(--border);padding:22px 20px 32px;color:var(--muted);font-size:.86rem;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{color:var(--yellow)}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.nav{padding:12px 14px}.hero{padding:40px 16px 30px}main{padding:0 14px 30px}.fields,.filters{grid-template-columns:1fr}.panel{padding:15px}.stats{gap:8px}.stat{padding:12px}.stat strong{font-size:1.35rem}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <nav class="nav">
+    <a class="brand" href="https://home.otxs.de">OT<span>XS</span></a>
+    <select id="appNav" aria-label="OTXS navigation">
+      <option value="">Explore OTXS</option>
+      <option value="https://home.otxs.de">Home</option>
+      <option value="https://explore.otxs.de">Destination Explorer</option>
+      <option value="https://planner.otxs.de">Trip Planner</option>
+      <option value="https://routes.otxs.de">Route Finder</option>
+      <option value="https://safety.otxs.de">Ride Safety</option>
+      <option value="https://ride-companion.otxs.de">Ride Companion</option>
+      <option value="https://apps.otxs.de">All Apps</option>
+    </select>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">OTXS · TRAVEL SMARTER</div>
+    <h1>Know the road.<br><span>Prepare for the journey.</span></h1>
+    <p>Record road closures, snowfall, landslides, construction and route hazards. Review traveller-submitted reports before heading out.</p>
+    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:20px">
+      <a class="btn" href="#reportForm">＋ Report a road issue</a>
+      <a class="btn secondary" href="#reports">View reports ↓</a>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="notice">
+    <strong>Safety notice:</strong> This is a community reporting board, not an official emergency or live traffic service. Reports are stored in this browser only. Verify conditions with local authorities and official sources before travelling. Do not stop in unsafe places to submit a report.
+  </div>
+
+  <section class="stats">
+    <div class="stat"><strong id="totalCount">0</strong><span>Total reports saved here</span></div>
+    <div class="stat"><strong id="activeCount">0</strong><span>Marked active</span></div>
+    <div class="stat"><strong id="highCount">0</strong><span>High severity</span></div>
+    <div class="stat"><strong id="todayCount">0</strong><span>Reported today</span></div>
+  </section>
+
+  <div class="layout">
+    <section id="reports">
+      <div class="panel">
+        <div class="heading">
+          <div><h2>Road reports</h2><p>Browse reports entered in this browser.</p></div>
+          <button class="btn secondary small" id="exportBtn" type="button">Export JSON</button>
+        </div>
+        <div class="filters">
+          <input id="search" type="search" placeholder="Search route, town, issue..." aria-label="Search reports">
+          <select id="typeFilter" aria-label="Filter by issue">
+            <option value="all">All issue types</option>
+            <option>Road closure</option><option>Landslide</option>
+            <option>Snowfall / ice</option><option>Flooding / water</option>
+            <option>Construction</option><option>Damaged road</option>
+            <option>Traffic delay</option><option>Other hazard</option>
+          </select>
+          <select id="severityFilter" aria-label="Filter by severity">
+            <option value="all">All severities</option>
+            <option>High</option><option>Medium</option><option>Low</option>
+          </select>
+        </div>
+        <div class="filters">
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option>Active</option><option>Resolved</option><option>Unconfirmed</option>
+          </select>
+          <select id="sortFilter" aria-label="Sort reports">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="severity">Highest severity</option>
+          </select>
+          <button class="btn ghost" id="clearFilters" type="button">Clear filters</button>
+        </div>
+        <div id="reportList" class="alert-list" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="panel" id="reportForm">
+        <div class="heading"><h2>Submit a report</h2></div>
+        <p style="font-size:.88rem;margin-bottom:16px">Add what you observed, where and when. Do not submit while riding or driving.</p>
+        <form id="newReport">
+          <div class="field">
+            <label for="route">Route / road name *</label>
+            <input id="route" required maxlength="120" placeholder="e.g. Solan to Shimla road">
+          </div>
+          <div class="fields">
+            <div class="field">
+              <label for="location">Specific location *</label>
+              <input id="location" required maxlength="120" placeholder="Town, landmark or km">
+            </div>
+            <div class="field">
+              <label for="district">District / region</label>
+              <input id="district" maxlength="100" placeholder="e.g. Solan">
+            </div>
+          </div>
+          <div class="fields">
+            <div class="field">
+              <label for="issueType">Issue type *</label>
+              <select id="issueType" required>
+                <option value="">Select an issue</option>
+                <option>Road closure</option><option>Landslide</option>
+                <option>Snowfall / ice</option><option>Flooding / water</option>
+                <option>Construction</option><option>Damaged road</option>
+                <option>Traffic delay</option><option>Other hazard</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="severity">Severity *</label>
+              <select id="severity" required>
+                <option>Medium</option><option>High</option><option>Low</option>
+              </select>
+            </div>
+          </div>
+          <div class="fields">
+            <div class="field">
+              <label for="status">Current status</label>
+              <select id="status">
+                <option>Unconfirmed</option><option>Active</option><option>Resolved</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="observed">Time observed *</label>
+              <input id="observed" type="datetime-local" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="details">Details *</label>
+            <textarea id="details" required maxlength="1000" placeholder="Describe the condition, direction affected and any safe alternative you know. Avoid speculation."></textarea>
+          </div>
+          <div class="field">
+            <label for="source">Source / verification</label>
+            <select id="source">
+              <option>Traveller observation — unverified</option>
+              <option>Local resident report — unverified</option>
+              <option>Official source checked</option>
+              <option>Second-hand information</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="expiry">Review after (hours)</label>
+            <select id="expiry">
+              <option value="6">6 hours</option><option value="12">12 hours</option>
+              <option value="24" selected>24 hours</option><option value="48">48 hours</option>
+              <option value="72">72 hours</option>
+            </select>
+          </div>
+          <div class="notice">Reports may become outdated quickly. This app does not verify submissions or automatically remove expired reports.</div>
+          <div class="form-actions">
+            <button class="btn" type="submit">Save report</button>
+            <button class="btn secondary" type="reset">Reset form</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Before you leave</h2>
+        <div class="tip"><strong>Check official updates</strong><span>Look for current road and weather notices from relevant local authorities.</span></div>
+        <div class="tip"><strong>Plan a backup route</strong><span>Mountain routes can close with little warning. Share your itinerary with someone.</span></div>
+        <div class="tip"><strong>Don't rely on one report</strong><span>Check its age, source and status; unverified information may be incorrect.</span></div>
+        <div class="tip"><strong>Emergency first</strong><span>Contact local emergency services if you encounter immediate danger. Do not approach unstable slopes or floodwater.</span></div>
+        <a class="btn secondary" style="width:100%;margin-top:12px" href="https://explore.otxs.de">Explore destinations ↗</a>
+      </div>
+
+      <div class="panel">
+        <h2>Backup your reports</h2>
+        <p style="font-size:.9rem">Export a JSON backup or import a previous backup. Data stays in this browser unless you export it yourself.</p>
+        <div class="form-actions" style="margin-top:12px">
+          <button class="btn secondary" id="importBtn" type="button">Import JSON</button>
+          <input id="importFile" type="file" accept=".json,application/json" hidden>
+          <button class="btn danger" id="deleteAllBtn" type="button">Delete all</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <div><strong style="color:var(--text)">OTXS</strong> · Discover and Explore</div>
+  <div><a href="https://home.otxs.de">Home</a> · <a href="https://explore.otxs.de">Destination Explorer</a> · <a href="https://apps.otxs.de">All Apps</a></div>
+  <div>© <span id="year"></span> OTXS</div>
+</footer>
+
+<script>
+(() => {
+  const STORAGE_KEY = "otxs_road_reports_v1";
+  const $ = id => document.getElementById(id);
+  let reports = loadReports();
+
+  function loadReports() {
+    try {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      return Array.isArray(data) ? data : [];
+    } catch { return []; }
+  }
+
+  function saveReports() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+      return true;
+    } catch {
+      alert("Could not save data. Browser storage may be full or disabled.");
+      return false;
+    }
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    })[c]);
+  }
+
+  function uid() {
+    return "road-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2,8);
+  }
+
+  function localDateTimeValue(date) {
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offset).toISOString().slice(0,16);
+  }
+
+  function severityClass(value) {
+    return value === "High" ? "high" : value === "Medium" ? "medium" : "low";
+  }
+
+  function isToday(value) {
+    const d = new Date(value), now = new Date();
+    return d.toDateString() === now.toDateString();
+  }
+
+  function isStale(report) {
+    return report.reviewAt && Date.now() > new Date(report.reviewAt).getTime();
+  }
+
+  function updateStats() {
+    $("totalCount").textContent = reports.length;
+    $("activeCount").textContent = reports.filter(r => r.status === "Active").length;
+    $("highCount").textContent = reports.filter(r => r.severity === "High" && r.status !== "Resolved").length;
+    $("todayCount").textContent = reports.filter(r => isToday(r.observedAt)).length;
+  }
+
+  function filteredReports() {
+    const q = $("search").value.trim().toLowerCase();
+    const type = $("typeFilter").value;
+    const severity = $("severityFilter").value;
+    const status = $("statusFilter").value;
+
+    let list = reports.filter(r => {
+      const haystack = [r.route,r.location,r.district,r.type,r.details,r.source,r.status].join(" ").toLowerCase();
+      return (!q || haystack.includes(q)) &&
+        (type === "all" || r.type === type) &&
+        (severity === "all" || r.severity === severity) &&
+        (status === "all" || r.status === status);
+    });
+
+    const sort = $("sortFilter").value;
+    if (sort === "oldest") list.sort((a,b) => new Date(a.observedAt)-new Date(b.observedAt));
+    else if (sort === "severity") {
+      const rank = {High:3,Medium:2,Low:1};
+      list.sort((a,b) => rank[b.severity]-rank[a.severity] || new Date(b.observedAt)-new Date(a.observedAt));
+    } else list.sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
+    return list;
+  }
+
+  function render() {
+    updateStats();
+    const list = filteredReports();
+    const container = $("reportList");
+
+    if (!list.length) {
+      container.innerHTML = `<div class="empty"><h3>No reports found</h3><p>Try different filters or submit a road report.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(r => {
+      const mapQuery = encodeURIComponent([r.location,r.route,r.district].filter(Boolean).join(", "));
+      const stale = isStale(r);
+      return `
+        <article class="alert">
+          <div class="alert-top">
+            <div>
+              <h3>${escapeHTML(r.route)}</h3>
+              <div style="color:var(--muted);font-size:.9rem">📍 ${escapeHTML(r.location)}${r.district ? " · " + escapeHTML(r.district) : ""}</div>
+            </div>
+            <span class="pill ${severityClass(r.severity)}">${escapeHTML(r.severity)}</span>
+          </div>
+          <div class="meta">
+            <span class="pill">${escapeHTML(r.type)}</span>
+            <span class="pill status">${escapeHTML(r.status)}</span>
+            <span class="pill">${escapeHTML(r.source)}</span>
+          </div>
+          <p>${escapeHTML(r.details)}</p>
+          <div class="meta">
+            <span>Observed: ${escapeHTML(new Date(r.observedAt).toLocaleString())}</span>
+            <span>Added: ${escapeHTML(new Date(r.createdAt).toLocaleString())}</span>
+          </div>
+          ${stale ? '<div class="notice" style="margin-top:8px;margin-bottom:0">Review time passed. This report may be outdated; verify before travel.</div>' : ""}
+          <div class="alert-actions">
+            <a class="btn secondary small" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=${mapQuery}">View area ↗</a>
+            <button class="btn secondary small" type="button" data-status="${escapeHTML(r.id)}">${r.status === "Resolved" ? "Mark active" : "Mark resolved"}</button>
+            <button class="btn ghost small" type="button" data-edit="${escapeHTML(r.id)}">Edit</button>
+            <button class="btn danger small" type="button" data-delete="${escapeHTML(r.id)}">Delete</button>
+          </div>
+        </article>`;
+    }).join("");
+
+    container.querySelectorAll("[data-status]").forEach(button => {
+      button.addEventListener("click", () => {
+        const r = reports.find(item => item.id === button.dataset.status);
+        if (!r) return;
+        r.status = r.status === "Resolved" ? "Active" : "Resolved";
+        saveReports(); render();
+      });
+    });
+
+    container.querySelectorAll("[data-delete]").forEach(button => {
+      button.addEventListener("click", () => {
+        const r = reports.find(item => item.id === button.dataset.delete);
+        if (!r || !confirm(`Delete report for "${r.route}"?`)) return;
+        reports = reports.filter(item => item.id !== r.id);
+        saveReports(); render();
+      });
+    });
+
+    container.querySelectorAll("[data-edit]").forEach(button => {
+      button.addEventListener("click", () => editReport(button.dataset.edit));
+    });
+  }
+
+  function editReport(id) {
+    const r = reports.find(item => item.id === id);
+    if (!r) return;
+
+    const route = prompt("Route / road name:", r.route);
+    if (route === null) return;
+    const location = prompt("Specific location:", r.location);
+    if (location === null) return;
+    const details = prompt("Report details:", r.details);
+    if (details === null) return;
+    const status = prompt("Status: Active, Resolved or Unconfirmed", r.status);
+    if (status === null) return;
+
+    const cleanStatus = ["Active","Resolved","Unconfirmed"].find(s => s.toLowerCase() === status.trim().toLowerCase());
+    if (!cleanStatus) {
+      alert("Status must be Active, Resolved or Unconfirmed.");
+      return;
+    }
+
+    if (!route.trim() || !location.trim() || !details.trim()) {
+      alert("Route, location and details cannot be blank.");
+      return;
+    }
+
+    r.route = route.trim().slice(0,120);
+    r.location = location.trim().slice(0,120);
+    r.details = details.trim().slice(0,1000);
+    r.status = cleanStatus;
+    r.updatedAt = new Date().toISOString();
+    saveReports(); render();
+  }
+
+  $("newReport").addEventListener("submit", event => {
+    event.preventDefault();
+
+    const observedAt = new Date($("observed").value);
+    if (Number.isNaN(observedAt.getTime())) {
+      alert("Please enter a valid observation date and time.");
+      return;
+    }
+
+    const hours = Number($("expiry").value);
+    const reviewAt = new Date(observedAt.getTime() + hours * 3600000);
+
+    const report = {
+      id: uid(),
+      route: $("route").value.trim(),
+      location: $("location").value.trim(),
+      district: $("district").value.trim(),
+      type: $("issueType").value,
+      severity: $("severity").value,
+      status: $("status").value,
+      observedAt: observedAt.toISOString(),
+      details: $("details").value.trim(),
+      source: $("source").value,
+      reviewAt: reviewAt.toISOString(),
+      createdAt: new Date().toISOString()
+    };
+
+    if (!report.route || !report.location || !report.type || !report.details) {
+      alert("Please complete all required fields.");
+      return;
+    }
+
+    reports.unshift(report);
+    if (saveReports()) {
+      $("newReport").reset();
+      setDefaultObservedTime();
+      render();
+      $("reports").scrollIntoView({behavior:"smooth"});
+    } else {
+      reports.shift();
+    }
+  });
+
+  function setDefaultObservedTime() {
+    $("observed").value = localDateTimeValue(new Date());
+  }
+
+  ["search","typeFilter","severityFilter","statusFilter","sortFilter"].forEach(id => {
+    $(id).addEventListener(id === "search" ? "input" : "change", render);
+  });
+
+  $("clearFilters").addEventListener("click", () => {
+    $("search").value = "";
+    $("typeFilter").value = "all";
+    $("severityFilter").value = "all";
+    $("statusFilter").value = "all";
+    $("sortFilter").value = "newest";
+    render();
+  });
+
+  function downloadJSON(data, filename) {
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  $("exportBtn").addEventListener("click", () => {
+    downloadJSON({
+      app:"OTXS Road Conditions & Alerts",
+      version:1,
+      exportedAt:new Date().toISOString(),
+      reports
+    }, "otxs-road-reports.json");
+  });
+
+  $("importBtn").addEventListener("click", () => $("importFile").click());
+
+  $("importFile").addEventListener("change", async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      const data = JSON.parse(await file.text());
+      const imported = Array.isArray(data) ? data : data.reports;
+      if (!Array.isArray(imported)) throw new Error("The file does not contain a reports array.");
+
+      const valid = imported.filter(r =>
+        r && typeof r.route === "string" &&
+        typeof r.location === "string" &&
+        typeof r.details === "string" &&
+        typeof r.observedAt === "string"
+      ).map(r => ({
+        id: typeof r.id === "string" ? r.id : uid(),
+        route: r.route.slice(0,120),
+        location: r.location.slice(0,120),
+        district: String(r.district || "").slice(0,100),
+        type: String(r.type || "Other hazard"),
+        severity: ["High","Medium","Low"].includes(r.severity) ? r.severity : "Medium",
+        status: ["Active","Resolved","Unconfirmed"].includes(r.status) ? r.status : "Unconfirmed",
+        observedAt: r.observedAt,
+        details: r.details.slice(0,1000),
+        source: String(r.source || "Imported — unverified"),
+        reviewAt: r.reviewAt || "",
+        createdAt: r.createdAt || new Date().toISOString()
+      }));
+
+      if (!valid.length) throw new Error("No valid reports found.");
+      if (!confirm(`Import ${valid.length} reports? Choose OK to merge with current reports.`)) return;
+
+      const ids = new Set(reports.map(r => r.id));
+      valid.forEach(r => {
+        if (ids.has(r.id)) r.id = uid();
+        reports.push(r);
+      });
+
+      if (saveReports()) {
+        render();
+        alert(`Imported ${valid.length} reports.`);
+      }
+    } catch (error) {
+      alert("Import failed: " + error.message);
+    } finally {
+      event.target.value = "";
+    }
+  });
+
+  $("deleteAllBtn").addEventListener("click", () => {
+    if (!reports.length) return alert("There are no reports to delete.");
+    if (!confirm("Delete every road report stored in this browser? Export a backup first if needed.")) return;
+    reports = [];
+    saveReports();
+    render();
+  });
+
+  $("appNav").addEventListener("change", event => {
+    if (event.target.value) window.location.href = event.target.value;
+  });
+
+  $("year").textContent = new Date().getFullYear();
+  setDefaultObservedTime();
+  render();
+})();
+</script>
+</body>
+</html>
+
